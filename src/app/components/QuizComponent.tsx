@@ -22,6 +22,15 @@ const QuizComponent = () => {
   const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
   const [isQuizFinished, setIsQuizFinished] = useState(false);
   const [isLastQuestion, setIsLastQuestion] = useState(false);
+  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // New state variable
+  const [answeredQuestionsDetails, setAnsweredQuestionsDetails] = useState<
+    {
+      question: string;
+      userAnswer: string;
+      correctAnswer: string;
+      isCorrect: boolean;
+    }[]
+  >([]); // New state variable
 
   useEffect(() => {
     const fetchData = async () => {
@@ -104,16 +113,30 @@ const QuizComponent = () => {
     // 最後の質問に回答した場合、次へボタンではなく結果を見るボタンを表示
     if (currentQuestionIndex === quizData.length - 1) {
       setNextButtonVisible(false); // 次へボタンを非表示に
-      setIsQuizFinished(true); // クイズ終了フラグを立てる
     } else {
       // 最後の質問以外の場合は次へボタンを表示
       setNextButtonVisible(true);
     }
+
+    // If the answer is correct, increment the count of correct answers
+    if (isCorrect) {
+      setCorrectAnswersCount(correctAnswersCount + 1);
+    }
+
+    // Add the question details to the answeredQuestionsDetails
+    setAnsweredQuestionsDetails([
+      ...answeredQuestionsDetails,
+      {
+        question: quizData[currentQuestionIndex].question,
+        userAnswer: selectedChoice,
+        correctAnswer,
+        isCorrect,
+      },
+    ]);
   };
 
-  const handleNextButtonClick = () => {
-    // ここに次へボタンがクリックされたときの処理を追加
-    // 例えば、何かしらの操作やログを記述するなど
+  const handleViewResultClick = () => {
+    setIsQuizFinished(true);
   };
 
   const progressBarStyle = {
@@ -123,35 +146,48 @@ const QuizComponent = () => {
     transition: "width 0.5s",
   };
 
+  // スコア計算
+  const scorePercentage =
+    Math.floor((correctAnswersCount / quizData.length) * 1000) / 10;
+
   return (
     <div id="qa-box" className="border border-slate-300 rounded-2xl py-8 px-14">
       {currentQuestionIndex < quizData.length && (
         <div className="qa-inner">
-          <p>設問数：{`${currentQuestionIndex + 1}/${quizData.length}`}</p>
-          <div className="progress-bar mb-8" style={progressBarStyle}></div>
-          <div id="qa-title" className="mb-6 font-bold">
-            {`Q.${currentQuestionIndex + 1}：${
-              quizData[currentQuestionIndex].question
-            }`}
-          </div>
-          <div id="qa-choices" className="">
-            <ul>
-              {quizData[currentQuestionIndex].choices.map((choice, index) => (
-                <li
-                  key={index}
-                  className={`flex justify-between border border-slate-400 p-3 mb-3 cursor-pointer ${
-                    isNextButtonDisabled ||
-                    answeredQuestions.includes(currentQuestionIndex)
-                      ? "cursor-not-allowed"
-                      : ""
-                  } ${selectedAnswer === index ? "bg-blue-100" : ""}`}
-                  onClick={() => handleChoiceClick(index)}
-                >
-                  {choice}
-                </li>
-              ))}
-            </ul>
-          </div>
+          {!isQuizFinished && (
+            <div className="progressLength">
+              <p>設問数：{`${currentQuestionIndex + 1}/${quizData.length}`}</p>
+              <div className="progress-bar mb-8" style={progressBarStyle}></div>
+            </div>
+          )}
+
+          {!isQuizFinished && (
+            <div id="qa-title" className="mb-6 font-bold">
+              {`Q.${currentQuestionIndex + 1}：${
+                quizData[currentQuestionIndex].question
+              }`}
+            </div>
+          )}
+          {!isQuizFinished && (
+            <div id="qa-choices" className="">
+              <ul>
+                {quizData[currentQuestionIndex].choices.map((choice, index) => (
+                  <li
+                    key={index}
+                    className={`flex justify-between border border-slate-400 p-3 mb-3 cursor-pointer ${
+                      isNextButtonDisabled ||
+                      answeredQuestions.includes(currentQuestionIndex)
+                        ? "cursor-not-allowed"
+                        : ""
+                    } ${selectedAnswer === index ? "bg-blue-100" : ""}`}
+                    onClick={() => handleChoiceClick(index)}
+                  >
+                    {choice}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {isNextButtonVisible && !isQuizFinished && (
             <div id="qa-next-button" className="flex justify-end mt-8">
               <button
@@ -163,125 +199,132 @@ const QuizComponent = () => {
               </button>
             </div>
           )}
-          {isQuizFinished && (
+          {isLastQuestion && selectedAnswer !== null && !isQuizFinished && (
             <div id="qa-next-button" className="flex justify-center mt-12">
-              <Link
-                href="/result"
+              <button
+                onClick={handleViewResultClick}
                 className="next block w-1/2 text-center p-4 bg-orange-500 text-white rounded hover:bg-orange-400"
               >
                 結果を見る
-              </Link>
+              </button>
+            </div>
+          )}
+          {isQuizFinished && (
+            <div id="result-box">
+              <p className="text-center font-bold text-2xl mb-10">実施結果</p>
+
+              <ul className="mb-5">
+                <li className="border-b border-gray-300 pb-3 mb-3">
+                  <dl className="flex flex-col md:flex-row md:items-center">
+                    <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
+                      合否
+                    </dt>
+                    <dd>
+                      {correctAnswersCount === quizData.length ? (
+                        <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block">
+                          合格
+                        </span>
+                      ) : (
+                        <span className="bg-red-600 px-6 py-1 text-white text-bold rounded-full inline-block">
+                          不合格
+                        </span>
+                      )}
+                      <span className="text-sm block mt-2">
+                        合格ライン：スコア100%以上
+                      </span>
+                    </dd>
+                  </dl>
+                </li>
+                <li className="border-b border-gray-300 pb-3 mb-3">
+                  <dl className="flex flex-col md:flex-row md:items-center">
+                    <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
+                      スコア
+                    </dt>
+                    <dd>
+                      <div>
+                        <span className="font-bold text-red-500">
+                          {scorePercentage}%
+                        </span>{" "}
+                        / 100%
+                      </div>
+                      <div>
+                        <div className="progressbar bg-gray-300 h-3 w-full">
+                          <div
+                            className="bg-orange-500 h-3"
+                            style={{ width: `${scorePercentage}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    </dd>
+                  </dl>
+                </li>
+                <li>
+                  <dl className="flex flex-col md:flex-row md:items-center">
+                    <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
+                      各設問の詳細
+                    </dt>
+                    <dd></dd>
+                  </dl>
+                </li>
+              </ul>
+
+              <div className="mb-20">
+                {answeredQuestionsDetails.map((detail, index) => (
+                  <div key={index} className="answer-card mb-10">
+                    <div className="mb-4 font-bold">
+                      Q.{index + 1}:
+                      {detail.isCorrect ? (
+                        <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block ml-2">
+                          正解
+                        </span>
+                      ) : (
+                        <span className="bg-red-600 px-6 py-1 text-white text-bold rounded-full inline-block ml-2">
+                          不正解
+                        </span>
+                      )}
+                    </div>
+                    <ul className="flex flex-col text-sm">
+                      <li className="bottom-1 border-black">
+                        <dl className="table w-full border border-gray-300">
+                          <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
+                            設問
+                          </dt>
+                          <dd className="table-cell p-4">{detail.question}</dd>
+                        </dl>
+                      </li>
+                      <li className="bottom-1 border-black">
+                        <dl className="table w-full border border-gray-300">
+                          <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
+                            あなたの回答
+                          </dt>
+                          <dd className="table-cell p-4">{detail.userAnswer}</dd>
+                        </dl>
+                      </li>
+                      <li className="bottom-1 border-black">
+                        <dl className="table w-full border border-gray-300">
+                          <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
+                            正答
+                          </dt>
+                          <dd className="table-cell p-4">{detail.correctAnswer}</dd>
+                        </dl>
+                      </li>
+                    </ul>
+                  </div>
+                ))}
+              </div>
+
+              <div className="flex justify-center flex-col">
+                <Link
+                  href="/quiz"
+                  className="bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
+                >
+                  もう一度挑戦する
+                </Link>
+              </div>
             </div>
           )}
         </div>
       )}
-      {/* ▼ここから結果画面▼ */}
-      <div id="result-box">
-        <p className="text-center font-bold text-2xl mb-10">実施結果</p>
-
-        <ul className="mb-5">
-          <li className="border-b border-gray-300 pb-3 mb-3">
-            <dl className="flex flex-col md:flex-row md:items-center">
-              <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">合否</dt>
-              <dd>
-                <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block">
-                  合格
-                </span>
-                or
-                <span className="bg-red-600 px-6 py-1 text-white text-bold rounded-full inline-block">
-                  不合格
-                </span>
-                <span className="text-sm block mt-2">
-                  合格ライン：スコア100%以上
-                </span>
-              </dd>
-            </dl>
-          </li>
-          <li className="border-b border-gray-300 pb-3 mb-3">
-            <dl className="flex flex-col md:flex-row md:items-center">
-              <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">スコア</dt>
-              <dd>
-                <div>
-                  <span className="font-bold text-red-500">100%</span> / 100%
-                </div>
-                <div>
-                  <div className="progressbar bg-gray-300 h-3 w-full">
-                    <div className="bg-orange-500 h-3"></div>
-                  </div>
-                </div>
-              </dd>
-            </dl>
-          </li>
-          <li>
-            <dl className="flex flex-col md:flex-row md:items-center">
-              <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
-                各設問の詳細
-              </dt>
-              <dd></dd>
-            </dl>
-          </li>
-        </ul>
-
-        <div className="mb-20">
-          <div className="answer-card mb-10">
-            <div className="mb-4 font-bold">
-              Q.1:
-              <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block ml-2">
-                合格
-              </span>
-              or
-              <span className="bg-red-600 px-6 py-1 text-white text-bold rounded-full inline-block ml-2">
-                不合格
-              </span>
-            </div>
-            <ul className="flex flex-col text-sm">
-              <li className="bottom-1 border-black">
-                <dl className="table w-full border border-gray-300">
-                  <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
-                    設問
-                  </dt>
-                  <dd className="table-cell p-4">
-                    JavaScriptのPromiseオブジェクトは何を行うために使用されるでしょう？
-                  </dd>
-                  <dt></dt>
-                </dl>
-              </li>
-              <li className="bottom-1 border-black">
-                <dl className="table w-full border border-gray-300">
-                  <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
-                    あなたの回答
-                  </dt>
-                  <dd className="table-cell p-4">
-                    あなたの回答あなたの回答あなたの回答あなたの回答あなたの回答あなたの回答あなたの回答あなたの回答
-                  </dd>
-                  <dt></dt>
-                </dl>
-              </li>
-              <li className="bottom-1 border-black">
-                <dl className="table w-full border border-gray-300">
-                  <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
-                    正答
-                  </dt>
-                  <dd className="table-cell p-4">
-                    正答正答正答正答正答正答正答正答正答正答正答正答正答正答正答正答正答
-                  </dd>
-                  <dt></dt>
-                </dl>
-              </li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex justify-center flex-col">
-          <Link
-            href="/quiz"
-            className="bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
-          >
-            もう一度挑戦する
-          </Link>
-        </div>
-      </div>
-      {/* ▲ここまで結果画面 */}
     </div>
   );
 };

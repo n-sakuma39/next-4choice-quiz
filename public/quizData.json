@@ -1146,7 +1146,7 @@
   {
     "ID": 105,
     "category": "js",
-    "question": "avaScriptのDateオブジェクトは何を扱うためのものでしょう？",
+    "question": "JavaScriptのDateオブジェクトは何を扱うためのものでしょう？",
     "choices1": "時間と日付の情報",
     "choices2": "グラフィックスのプロパティ",
     "choices3": "Reactのprops",
