@@ -219,7 +219,7 @@ const QuizComponent = () => {
                     <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
                       合否
                     </dt>
-                    <dd>
+                    <dd className="w-full">
                       {correctAnswersCount === quizData.length ? (
                         <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block">
                           合格
@@ -240,7 +240,7 @@ const QuizComponent = () => {
                     <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
                       スコア
                     </dt>
-                    <dd>
+                    <dd className="w-full">
                       <div>
                         <span className="font-bold text-red-500">
                           {scorePercentage}%
@@ -297,7 +297,9 @@ const QuizComponent = () => {
                           <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
                             あなたの回答
                           </dt>
-                          <dd className="table-cell p-4">{detail.userAnswer}</dd>
+                          <dd className="table-cell p-4">
+                            {detail.userAnswer}
+                          </dd>
                         </dl>
                       </li>
                       <li className="bottom-1 border-black">
@@ -305,7 +307,9 @@ const QuizComponent = () => {
                           <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
                             正答
                           </dt>
-                          <dd className="table-cell p-4">{detail.correctAnswer}</dd>
+                          <dd className="table-cell p-4">
+                            {detail.correctAnswer}
+                          </dd>
                         </dl>
                       </li>
                     </ul>
@@ -314,12 +318,12 @@ const QuizComponent = () => {
               </div>
 
               <div className="flex justify-center flex-col">
-                <Link
-                  href="/quiz"
+                <button
+                  onClick={() => window.location.reload()}
                   className="bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
                 >
                   もう一度挑戦する
-                </Link>
+                </button>
               </div>
             </div>
           )}
