@@ -41,7 +41,7 @@ const QuizComponent = () => {
         }
         const data = await response.json();
 
-        // ランダムにシャッフルし、最大10件取得
+        // ランダムにシャッフルし、最大件数を取得する
         const shuffledData = data
           .sort(() => Math.random() - 0.5)
           .slice(0, 3)
@@ -151,7 +151,10 @@ const QuizComponent = () => {
     Math.floor((correctAnswersCount / quizData.length) * 1000) / 10;
 
   return (
-    <div id="qa-box" className="border border-slate-300 rounded-2xl py-8 px-14">
+    <div
+      id="qa-box"
+      className="py-4 px-7 sm:py-8 sm:px-14 sm:mx-4 border border-slate-300 rounded-2xl"
+    >
       {currentQuestionIndex < quizData.length && (
         <div className="qa-inner">
           {!isQuizFinished && (
