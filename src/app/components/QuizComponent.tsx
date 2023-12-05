@@ -31,6 +31,8 @@ const QuizComponent = () => {
       isCorrect: boolean;
     }[]
   >([]); // New state variable
+  const [progress, setProgress] = useState(0); // New state variable for progress bar
+  const [progressCount, setProgressCount] = useState(0); // New state variable for progress count
 
   useEffect(() => {
     const fetchData = async () => {
@@ -76,20 +78,15 @@ const QuizComponent = () => {
   const handleNextQuestion = () => {
     if (currentQuestionIndex < quizData.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
+      setSelectedAnswer(null); // Reset the selection when moving to the next question
     } else {
       setIsQuizFinished(true);
     }
     setNextButtonDisabled(true);
-    setSelectedAnswer(null);
     setIsAnswerCorrect(null);
   };
 
   const handleChoiceClick = (choiceIndex: number) => {
-    // すでに回答済みの場合は処理しない
-    if (answeredQuestions.includes(currentQuestionIndex)) {
-      return;
-    }
-
     const selectedChoice = quizData[currentQuestionIndex].choices[choiceIndex];
     const correctAnswer = quizData[currentQuestionIndex].answer;
 
@@ -123,16 +120,61 @@ const QuizComponent = () => {
       setCorrectAnswersCount(correctAnswersCount + 1);
     }
 
-    // Add the question details to the answeredQuestionsDetails
-    setAnsweredQuestionsDetails([
-      ...answeredQuestionsDetails,
-      {
+    // Check if the question has already been answered
+    const answeredQuestionIndex = answeredQuestions.findIndex(
+      (answeredQuestion) => answeredQuestion === currentQuestionIndex
+    );
+
+    // If the question has not been answered yet, update the progress bar and progressCount
+    if (answeredQuestionIndex === -1) {
+      setProgress(progress + 1);
+      setProgressCount(progressCount + 1);
+      // Add the current question to the list of answered questions
+      setAnsweredQuestions([...answeredQuestions, currentQuestionIndex]);
+    }
+
+    // If the question has already been answered, update the answer
+    if (answeredQuestionIndex !== -1) {
+      const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
+      updatedAnsweredQuestionsDetails[answeredQuestionIndex] = {
         question: quizData[currentQuestionIndex].question,
         userAnswer: selectedChoice,
         correctAnswer,
         isCorrect,
-      },
-    ]);
+      };
+      setAnsweredQuestionsDetails(updatedAnsweredQuestionsDetails);
+    } else {
+      // If the question has not been answered yet, add the answer
+      setAnsweredQuestionsDetails([
+        ...answeredQuestionsDetails,
+        {
+          question: quizData[currentQuestionIndex].question,
+          userAnswer: selectedChoice,
+          correctAnswer,
+          isCorrect,
+        },
+      ]);
+    }
+  };
+
+  const handlePreviousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(currentQuestionIndex - 1);
+      // Restore the previous selection
+      const previousQuestionDetails = answeredQuestionsDetails[currentQuestionIndex - 1];
+      const previousSelectedAnswer = quizData[currentQuestionIndex - 1].choices.indexOf(previousQuestionDetails.userAnswer);
+      setSelectedAnswer(previousSelectedAnswer);
+
+      // Update the answeredQuestionsDetails and correctAnswersCount
+      const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
+      updatedAnsweredQuestionsDetails.pop();
+      setAnsweredQuestionsDetails(updatedAnsweredQuestionsDetails);
+
+      const lastAnswerIsCorrect = updatedAnsweredQuestionsDetails.length > 0 ? updatedAnsweredQuestionsDetails[updatedAnsweredQuestionsDetails.length - 1].isCorrect : false;
+      if (lastAnswerIsCorrect) {
+        setCorrectAnswersCount(correctAnswersCount - 1);
+      }
+    }
   };
 
   const handleViewResultClick = () => {
@@ -140,7 +182,7 @@ const QuizComponent = () => {
   };
 
   const progressBarStyle = {
-    width: `${((currentQuestionIndex + 1) / quizData.length) * 100}%`,
+    width: `${(progress / quizData.length) * 100}%`,
     height: "10px",
     backgroundColor: "#4caf50",
     transition: "width 0.5s",
@@ -159,7 +201,7 @@ const QuizComponent = () => {
         <div className="qa-inner">
           {!isQuizFinished && (
             <div className="progressLength">
-              <p>設問数：{`${currentQuestionIndex + 1}/${quizData.length}`}</p>
+              <p>進捗：{`${progressCount}/${quizData.length}`}</p>
               <div className="progress-bar mb-8" style={progressBarStyle}></div>
             </div>
           )}
@@ -191,17 +233,31 @@ const QuizComponent = () => {
               </ul>
             </div>
           )}
-          {isNextButtonVisible && !isQuizFinished && (
-            <div id="qa-next-button" className="flex justify-end mt-8">
+          <div className="flex justify-between mt-8">
+            {currentQuestionIndex > 0 && !isQuizFinished ? (
               <button
-                className="next inline-block px-4 py-2 bg-blue-500 text-white rounded hover-bg-blue-600"
-                onClick={handleNextQuestion}
-                disabled={isNextButtonDisabled}
+                className="prev inline-block px-4 py-2 bg-blue-500 text-white rounded hover-bg-blue-600"
+                onClick={handlePreviousQuestion}
               >
-                次へ
+                &lt; 前の設問に戻る
               </button>
-            </div>
-          )}
+            ) : (
+              <div></div> // 空のdivを追加
+            )}
+            {isNextButtonVisible && !isQuizFinished ? (
+              <div id="qa-next-button">
+                <button
+                  className="next inline-block px-4 py-2 bg-blue-500 text-white rounded hover-bg-blue-600"
+                  onClick={handleNextQuestion}
+                  disabled={isNextButtonDisabled}
+                >
+                  次の質問に進む &gt;
+                </button>
+              </div>
+            ) : (
+              <div></div> // 空のdivを追加
+            )}
+          </div>
           {isLastQuestion && selectedAnswer !== null && !isQuizFinished && (
             <div id="qa-next-button" className="flex justify-center mt-12">
               <button
