@@ -1,8 +1,6 @@
-// QuizComponent.tsx
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-
 interface QuizData {
   ID: number;
   category: string;
@@ -30,9 +28,9 @@ const QuizComponent = () => {
       correctAnswer: string;
       isCorrect: boolean;
     }[]
-  >([]); // New state variable
-  const [progress, setProgress] = useState(0); // New state variable for progress bar
-  const [progressCount, setProgressCount] = useState(0); // New state variable for progress count
+  >([]);
+  const [progress, setProgress] = useState(0);
+  const [progressCount, setProgressCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -46,7 +44,7 @@ const QuizComponent = () => {
         // ランダムにシャッフルし、最大件数を取得する
         const shuffledData = data
           .sort(() => Math.random() - 0.5)
-          .slice(0, 3)
+          .slice(0, 10)
           .map((question: any, index: number) => {
             const choices = [
               question.choices1?.toString() || "",
@@ -54,7 +52,7 @@ const QuizComponent = () => {
               question.choices3?.toString() || "",
               question.choices4?.toString() || "",
             ];
-            return { ...question, choices, ID: index + 1 }; // 連番のIDを設定
+            return { ...question, choices, ID: index + 1 };
           });
 
         setQuizData(shuffledData);
@@ -115,25 +113,20 @@ const QuizComponent = () => {
       setNextButtonVisible(true);
     }
 
-    // If the answer is correct, increment the count of correct answers
     if (isCorrect) {
       setCorrectAnswersCount(correctAnswersCount + 1);
     }
 
-    // Check if the question has already been answered
     const answeredQuestionIndex = answeredQuestions.findIndex(
       (answeredQuestion) => answeredQuestion === currentQuestionIndex
     );
 
-    // If the question has not been answered yet, update the progress bar and progressCount
     if (answeredQuestionIndex === -1) {
       setProgress(progress + 1);
       setProgressCount(progressCount + 1);
-      // Add the current question to the list of answered questions
       setAnsweredQuestions([...answeredQuestions, currentQuestionIndex]);
     }
 
-    // If the question has already been answered, update the answer
     if (answeredQuestionIndex !== -1) {
       const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
       updatedAnsweredQuestionsDetails[answeredQuestionIndex] = {
@@ -144,7 +137,6 @@ const QuizComponent = () => {
       };
       setAnsweredQuestionsDetails(updatedAnsweredQuestionsDetails);
     } else {
-      // If the question has not been answered yet, add the answer
       setAnsweredQuestionsDetails([
         ...answeredQuestionsDetails,
         {
@@ -160,17 +152,23 @@ const QuizComponent = () => {
   const handlePreviousQuestion = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      // Restore the previous selection
-      const previousQuestionDetails = answeredQuestionsDetails[currentQuestionIndex - 1];
-      const previousSelectedAnswer = quizData[currentQuestionIndex - 1].choices.indexOf(previousQuestionDetails.userAnswer);
+      const previousQuestionDetails =
+        answeredQuestionsDetails[currentQuestionIndex - 1];
+      const previousSelectedAnswer = quizData[
+        currentQuestionIndex - 1
+      ].choices.indexOf(previousQuestionDetails.userAnswer);
       setSelectedAnswer(previousSelectedAnswer);
 
-      // Update the answeredQuestionsDetails and correctAnswersCount
       const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
       updatedAnsweredQuestionsDetails.pop();
       setAnsweredQuestionsDetails(updatedAnsweredQuestionsDetails);
 
-      const lastAnswerIsCorrect = updatedAnsweredQuestionsDetails.length > 0 ? updatedAnsweredQuestionsDetails[updatedAnsweredQuestionsDetails.length - 1].isCorrect : false;
+      const lastAnswerIsCorrect =
+        updatedAnsweredQuestionsDetails.length > 0
+          ? updatedAnsweredQuestionsDetails[
+              updatedAnsweredQuestionsDetails.length - 1
+            ].isCorrect
+          : false;
       if (lastAnswerIsCorrect) {
         setCorrectAnswersCount(correctAnswersCount - 1);
       }

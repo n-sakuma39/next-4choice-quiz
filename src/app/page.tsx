@@ -4,7 +4,7 @@ const Home = () => {
   return (
     <div className="container mx-auto flex justify-center flex-col md:w-3/4 my-12 bg-white p-10">
       <h1 className="font-bold text-3xl mb-10 text-center">
-        CODING 4-CHOICE QUIZ
+        コーディング4択問題
       </h1>
 
       <p className="mb-5">

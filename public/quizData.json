@@ -1804,7 +1804,7 @@
     "explanation": "nth-child(even)は偶数番目の要素を選択します。この場合、偶数番目のsection要素に青い境界線が適用されます。"
   },
   {
-    "ID": "",
+    "ID": 165,
     "category": "css",
     "question": "CSSのnth-of-typeとnth-childの説明として正しいものはどれでしょう？",
     "choices1": "nth-of-typeは要素の種類に基づいて要素を選択し、nth-childは要素の位置に基づいて選択する。",
@@ -1815,7 +1815,7 @@
     "explanation": "nth-childは要素の位置に基づいて要素を選択します。例えば、nth-child(2)は要素の2番目を選択するだけです。 nth-of-typeは要素の種類に基づいて要素を選択します。例えば、p:nth-of-type(2)は<p>要素のなかで2番目のものを選択します。"
   },
   {
-    "ID": "",
+    "ID": 166,
     "category": "js",
     "question": "JavaScriptにおいて、FormDataオブジェクトを使用してフォームデータを取得するためにはどのメソッドを使用しますか？",
     "choices1": "getForm()",
@@ -1826,7 +1826,7 @@
     "explanation": "フォームデータを取得するためには、new FormData()を使用します。これにより、対象のフォーム内の要素からデータが取得され、新しいFormDataオブジェクトが生成されます。"
   },
   {
-    "ID": "",
+    "ID": 167,
     "category": "js",
     "question": "フォームの実装でJavaScriptのFormDataオブジェクトを使用する主なメリットは何でしょう？",
     "choices1": "データの暗号化",
@@ -1837,7 +1837,7 @@
     "explanation": "FormDataオブジェクトは、HTMLフォームから容易にデータを収集し、それをサーバーに送信するための手段を提供します。これにより、フォームデータを手動で構築する必要がなくなり、簡潔で効果的なコードを書くことができます。"
   },
   {
-    "ID": "",
+    "ID": 168,
     "category": "js",
     "question": "JavaScriptのFileReaderを使用して読み込んだファイルのデータはどのようにアクセスしますか？",
     "choices1": "file.length",
@@ -1848,7 +1848,7 @@
     "explanation": "FileReaderで読み込んだファイルのデータはfile.resultプロパティからアクセスできます。これには、テキストデータの場合は文字列、画像データの場合はデータURLなどが含まれます。"
   },
   {
-    "ID": "",
+    "ID": 169,
     "category": "js",
     "question": "JavaScriptのFileListは何のために使用されるものでしょう？",
     "choices1": "テキストの検索",
@@ -1857,5 +1857,181 @@
     "choices4": "ページの遷移",
     "answer": "ファイルの選択と添付",
     "explanation": "FileListは、HTMLの<input type=\"file\">要素を使用してユーザーが選択したファイルの情報を格納するオブジェクトです。これを使用することで、JavaScriptを介してユーザーが選択したファイルにアクセスし、処理することができます。"
+  },
+  {
+    "ID": 170,
+    "category": "html",
+    "question": "HTMLのinputタグから添付したファイルデータはFileListのどのプロパティにあるでしょう？",
+    "choices1": "file",
+    "choices2": "item",
+    "choices3": "files",
+    "choices4": "name",
+    "answer": "files",
+    "explanation": "FileList内の各ファイルにアクセスするには、filesプロパティを使用します。例えばconst selectedFiles = inputElement.files;のようにしてFileListを取得し、それからselectedFiles[0]などで個々のファイルにアクセスできます。"
+  },
+  {
+    "ID": 171,
+    "category": "js",
+    "question": "JavaScriptのaddEventListenerのイベントについて、ファイル添付に使用するイベントはどれでしょう？",
+    "choices1": "click",
+    "choices2": "input",
+    "choices3": "change",
+    "choices4": "dblclick",
+    "answer": "change",
+    "explanation": "このイベントを利用して、新しく選択されたファイルに対する処理を実行することができます。"
+  },
+  {
+    "ID": 172,
+    "category": "html",
+    "question": "Webページ上でファイルの添付を可能にするために、HTML内でどの要素が使用されますか？",
+    "choices1": "<input type=\"file\">",
+    "choices2": "<file-input multiple>",
+    "choices3": "<upload-file accept=\".png\">",
+    "choices4": "<attach-file>",
+    "answer": "<input type=\"file\">",
+    "explanation": "<input type=\"file\">要素は、ユーザーがファイルを選択できるファイル入力フィールドを作成します。これを使用すると、ユーザーはファイルを選択してアップロードできます。"
+  },
+  {
+    "ID": 173,
+    "category": "js",
+    "question": "ファイル添付された後、JavaScriptでファイルの内容を読み取るために使用されるオブジェクトは次のうちどれですか？",
+    "choices1": "DataLoader",
+    "choices2": "FileHandler",
+    "choices3": "FileUploader",
+    "choices4": "FileReader",
+    "answer": "FileReader",
+    "explanation": "FileReaderオブジェクトは、非同期的にファイルの内容を読み取るために使用されます。これを使って、ファイルの中身を取得してさまざまな処理を行うことができます。"
+  },
+  {
+    "ID": 174,
+    "category": "js",
+    "question": "JavaScriptのfetchメソッドを使用してファイルを送信する際、どのHTTPメソッドが使用されますか？",
+    "choices1": "GET",
+    "choices2": "POST",
+    "choices3": "PUT",
+    "choices4": "SEND",
+    "answer": "POST",
+    "explanation": "fetchメソッドを使用してファイルを送信する場合、通常はPOSTメソッドが使われます。POSTメソッドは、サーバーにデータを送信するためによく使用されます。例えば、フォームデータやファイルを送信する場合にはPOSTメソッドが一般的です。"
+  },
+  {
+    "ID": 175,
+    "category": "js",
+    "question": "JavaScriptのfetchメソッドを使用してファイルを送信する際にオプションとして使用できる項目として存在しないプロパティはどれでしょう？",
+    "choices1": "body",
+    "choices2": "method",
+    "choices3": "date",
+    "choices4": "headers",
+    "answer": "date",
+    "explanation": "fetchメソッドでファイルを送信するとき、headers、body、methodなどオプションを使用します。これにより、送信するデータに関する情報や認証情報などをカスタマイズできます。ちなみにdateというオプションは存在しません。"
+  },
+  {
+    "ID": 176,
+    "category": "js",
+    "question": "Google Apps Script (GAS) はもともとは何を目的としたプログラミング言語ですか？",
+    "choices1": "ゲーム開発",
+    "choices2": "ウェブ開発",
+    "choices3": "データベース管理",
+    "choices4": "スマートフォンアプリケーション",
+    "answer": "ウェブ開発",
+    "explanation": "Google Apps Script (GAS) は、Google Workspace アプリケーション（Google ドキュメント、スプレッドシート、フォームなど）の自動化や拡張機能の開発など、ウェブ開発関連のタスクを行うためのスクリプト言語として登場しました。"
+  },
+  {
+    "ID": 177,
+    "category": "js",
+    "question": "GAS で Google スプレッドシート内のデータにアクセスするために使用されるオブジェクトはどれですか？",
+    "choices1": "SpreadsheetApp",
+    "choices2": "DocumentApp",
+    "choices3": "DriveApp",
+    "choices4": "GmailApp",
+    "answer": "SpreadsheetApp",
+    "explanation": "\"SpreadsheetApp\" オブジェクトは、Google Apps Script から Google スプレッドシート内のデータにアクセスするために使用されます。これを使用すると、セルの値の取得や変更、シートの作成などができます。"
+  },
+  {
+    "ID": 178,
+    "category": "js",
+    "question": "GAS でウェブアプリケーションを作成するために使用される関数はどれでしょう？",
+    "choices1": "createWebApp()",
+    "choices2": "buildWebApp()",
+    "choices3": "HtmlService.createHtmlOutput()",
+    "choices4": "WebAppService.createApp()",
+    "answer": "HtmlService.createHtmlOutput()",
+    "explanation": "ウェブアプリケーションを作成するためには、\"HtmlService.createHtmlOutput()\" 関数が使用されます。これを使用して、HTML コンテンツを作成し、それをウェブアプリケーションとして提供することができます。"
+  },
+  {
+    "ID": 179,
+    "category": "js",
+    "question": "JavaScriptのclass構文でconstructorメソッドが実行されるのはどの時点でしょう？",
+    "choices1": "クラスが宣言されるとき",
+    "choices2": "クラスがインスタンス化されるとき",
+    "choices3": "クラスがエクスポートされるとき",
+    "choices4": "常に実行されている",
+    "answer": "クラスがインスタンス化されるとき",
+    "explanation": "constructorメソッドは、クラスが新しいインスタンスで呼び出されるときに実行されます。これは通常、newキーワードを使用してクラスからオブジェクトを作成するときです。"
+  },
+  {
+    "ID": 180,
+    "category": "js",
+    "question": "JavaScriptのclass構文でextendsキーワードは何を行うために使用されるでしょう？",
+    "choices1": "クラスのインスタンスを生成する",
+    "choices2": "既存のクラスを拡張して新しいクラスを作成する",
+    "choices3": "クラスのプロトタイプを変更する",
+    "choices4": "クラスを削除する",
+    "answer": "既存のクラスを拡張して新しいクラスを作成する",
+    "explanation": "extendsキーワードは、クラスを継承して新しいクラスを作成するために使用されます。サブクラス（子クラス）は親クラスのメソッドやプロパティを継承し、必要に応じて追加または上書きすることができます。"
+  },
+  {
+    "ID": 181,
+    "category": "js",
+    "question": "JavaScriptにおいて、クラスというキーワードは何を表すものでしょうか？",
+    "choices1": "変数の集合",
+    "choices2": "関数の集合",
+    "choices3": "オブジェクトの設計図",
+    "choices4": "条件文の塊",
+    "answer": "オブジェクトの設計図",
+    "explanation": "クラスはオブジェクトの設計図です。オブジェクトはクラスから生成され、同じクラスから生成されたオブジェクトは同じプロパティとメソッドを共有します。"
+  },
+  {
+    "ID": 182,
+    "category": "js",
+    "question": "JavaScriptにおいて、クラス内で定義された関数を何いうキーワードで呼びますか？",
+    "choices1": "関数",
+    "choices2": "インスタンス",
+    "choices3": "アロー関数",
+    "choices4": "メソッド",
+    "answer": "メソッド",
+    "explanation": "クラス内で定義された関数はメソッドと呼ばれます。オブジェクトはこれらのメソッドを使用して振る舞いを持ちます。"
+  },
+  {
+    "ID": 183,
+    "category": "js",
+    "question": "JavaScriptでスクロールイベントの処理中に、スクロールできるコンテンツの高さを知るためのプロパティは次のうちどれでしょう？",
+    "choices1": "toUpperCase()",
+    "choices2": "click()",
+    "choices3": "scrollHeight",
+    "choices4": "innerHTML",
+    "answer": "scrollHeight",
+    "explanation": "scrollHeightは、要素のスクロール可能な高さを取得するためのプロパティです。スクロール位置とスクロール可能な高さを比較して、ページの一番下にスクロールしたかどうかなどを判断するのに役立ちます。"
+  },
+  {
+    "ID": 184,
+    "category": "css",
+    "question": "CSSで横並びのFlexコンテナ内の子要素を垂直方向の揃え方を設定するプロパティはどれでしょう？",
+    "choices1": "align-items",
+    "choices2": "justify-content",
+    "choices3": "align-content",
+    "choices4": "flex-direction",
+    "answer": "align-items",
+    "explanation": "align-itemsプロパティは、Flexコンテナ内のFlexアイテムを垂直軸（通常は縦方向）に沿って中央に揃えます。"
+  },
+  {
+    "ID": 185,
+    "category": "css",
+    "question": "CSSのalign-contentプロパティは何を制御するプロパティでしょう？",
+    "choices1": "要素の文字の配置",
+    "choices2": "要素の縦方向の中央揃え",
+    "choices3": "フレックスコンテナ内で複数の行がある場合の配置",
+    "choices4": "要素の横方向の中央揃え",
+    "answer": "フレックスコンテナ内で複数の行がある場合の配置",
+    "explanation": "align-contentは、フレックスコンテナ内のフレックスアイテムが複数の行にまたがる場合に、行全体の配置を制御します。このプロパティは、フレックスアイテムがフレックスコンテナ内でどのように配置されるかに影響を与えます。"
   }
 ]
