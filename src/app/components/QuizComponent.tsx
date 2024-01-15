@@ -30,32 +30,41 @@ const QuizComponent = () => {
     }[]
   >([]);
   const [progress, setProgress] = useState(0);
-  const [progressCount, setProgressCount] = useState(0);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await fetch("/quizData.json");
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+        // ローカルストレージから設問データを取得
+        const storedQuizData = localStorage.getItem("quizData");
+        if (storedQuizData) {
+          // ローカルストレージにデータが存在する場合、それを使用
+          setQuizData(JSON.parse(storedQuizData));
+        } else {
+          // ローカルストレージにデータが存在しない場合、新たにデータを取得
+          const response = await fetch("/quizData.json");
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+
+          // ランダムにシャッフルし、最大件数を取得する
+          const shuffledData = data
+            .sort(() => Math.random() - 0.5)
+            .slice(0, 3)
+            .map((question: any, index: number) => {
+              const choices = [
+                question.choices1?.toString() || "",
+                question.choices2?.toString() || "",
+                question.choices3?.toString() || "",
+                question.choices4?.toString() || "",
+              ];
+              return { ...question, choices, ID: index + 1 };
+            });
+
+          // 設問データをステートとローカルストレージに保存
+          setQuizData(shuffledData);
+          localStorage.setItem("quizData", JSON.stringify(shuffledData));
         }
-        const data = await response.json();
-
-        // ランダムにシャッフルし、最大件数を取得する
-        const shuffledData = data
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 10)
-          .map((question: any, index: number) => {
-            const choices = [
-              question.choices1?.toString() || "",
-              question.choices2?.toString() || "",
-              question.choices3?.toString() || "",
-              question.choices4?.toString() || "",
-            ];
-            return { ...question, choices, ID: index + 1 };
-          });
-
-        setQuizData(shuffledData);
       } catch (error) {
         console.error(error);
       }
@@ -117,36 +126,16 @@ const QuizComponent = () => {
       setCorrectAnswersCount(correctAnswersCount + 1);
     }
 
-    const answeredQuestionIndex = answeredQuestions.findIndex(
-      (answeredQuestion) => answeredQuestion === currentQuestionIndex
-    );
-
-    if (answeredQuestionIndex === -1) {
-      setProgress(progress + 1);
-      setProgressCount(progressCount + 1);
-      setAnsweredQuestions([...answeredQuestions, currentQuestionIndex]);
-    }
-
-    if (answeredQuestionIndex !== -1) {
-      const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
-      updatedAnsweredQuestionsDetails[answeredQuestionIndex] = {
+    // Add the selected choice and its correctness to answeredQuestionsDetails
+    setAnsweredQuestionsDetails([
+      ...answeredQuestionsDetails,
+      {
         question: quizData[currentQuestionIndex].question,
         userAnswer: selectedChoice,
         correctAnswer,
         isCorrect,
-      };
-      setAnsweredQuestionsDetails(updatedAnsweredQuestionsDetails);
-    } else {
-      setAnsweredQuestionsDetails([
-        ...answeredQuestionsDetails,
-        {
-          question: quizData[currentQuestionIndex].question,
-          userAnswer: selectedChoice,
-          correctAnswer,
-          isCorrect,
-        },
-      ]);
-    }
+      },
+    ]);
   };
 
   const handlePreviousQuestion = () => {
@@ -154,10 +143,14 @@ const QuizComponent = () => {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
       const previousQuestionDetails =
         answeredQuestionsDetails[currentQuestionIndex - 1];
-      const previousSelectedAnswer = quizData[
-        currentQuestionIndex - 1
-      ].choices.indexOf(previousQuestionDetails.userAnswer);
-      setSelectedAnswer(previousSelectedAnswer);
+
+      // Check if previousQuestionDetails is not undefined
+      if (previousQuestionDetails) {
+        const previousSelectedAnswer = quizData[
+          currentQuestionIndex - 1
+        ].choices.indexOf(previousQuestionDetails.userAnswer);
+        setSelectedAnswer(previousSelectedAnswer);
+      }
 
       const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
       updatedAnsweredQuestionsDetails.pop();
@@ -179,8 +172,15 @@ const QuizComponent = () => {
     setIsQuizFinished(true);
   };
 
+  const handleRetry = () => {
+    // ローカルストレージの設問データを削除
+    localStorage.removeItem("quizData");
+    // ページをリロード
+    window.location.reload();
+  };
+
   const progressBarStyle = {
-    width: `${(progress / quizData.length) * 100}%`,
+    width: `${((currentQuestionIndex + 1) / quizData.length) * 100}%`,
     height: "10px",
     backgroundColor: "#4caf50",
     transition: "width 0.5s",
@@ -193,13 +193,13 @@ const QuizComponent = () => {
   return (
     <div
       id="qa-box"
-      className="py-4 px-7 sm:py-8 sm:px-14 sm:mx-4 border border-slate-300 rounded-2xl"
+      className="py-4 px-5 sm:py-8 sm:px-14 sm:mx-4 border border-slate-300 rounded-2xl"
     >
       {currentQuestionIndex < quizData.length && (
         <div className="qa-inner">
           {!isQuizFinished && (
             <div className="progressLength">
-              <p>進捗：{`${progressCount}/${quizData.length}`}</p>
+              <p>進捗：{`${currentQuestionIndex + 1}/${quizData.length}`}</p>
               <div className="progress-bar mb-8" style={progressBarStyle}></div>
             </div>
           )}
@@ -234,7 +234,7 @@ const QuizComponent = () => {
           <div className="flex justify-between mt-8">
             {currentQuestionIndex > 0 && !isQuizFinished ? (
               <button
-                className="prev inline-block px-4 py-2 bg-blue-500 text-white rounded hover-bg-blue-600"
+                className="prev inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
                 onClick={handlePreviousQuestion}
               >
                 &lt; 前の設問に戻る
@@ -245,7 +245,7 @@ const QuizComponent = () => {
             {isNextButtonVisible && !isQuizFinished ? (
               <div id="qa-next-button">
                 <button
-                  className="next inline-block px-4 py-2 bg-blue-500 text-white rounded hover-bg-blue-600"
+                  className="next inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
                   onClick={handleNextQuestion}
                   disabled={isNextButtonDisabled}
                 >
@@ -257,7 +257,7 @@ const QuizComponent = () => {
             )}
           </div>
           {isLastQuestion && selectedAnswer !== null && !isQuizFinished && (
-            <div id="qa-next-button" className="flex justify-center mt-12">
+            <div id="qa-next-button" className="flex justify-center my-8">
               <button
                 onClick={handleViewResultClick}
                 className="next block w-1/2 text-center p-4 bg-orange-500 text-white rounded hover:bg-orange-400"
@@ -376,7 +376,7 @@ const QuizComponent = () => {
 
               <div className="flex justify-center flex-col">
                 <button
-                  onClick={() => window.location.reload()}
+                  onClick={handleRetry}
                   className="bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
                 >
                   もう一度挑戦する
