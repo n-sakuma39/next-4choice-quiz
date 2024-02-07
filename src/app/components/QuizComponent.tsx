@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-interface QuizData {
+interface Quiz {
   ID: number;
   category: string;
   question: string;
@@ -10,18 +10,18 @@ interface QuizData {
   explanation: string;
 }
 
-const QuizComponent = () => {
-  const [quizData, setQuizData] = useState<QuizData[]>([]);
-  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [isNextButtonDisabled, setNextButtonDisabled] = useState(true);
-  const [selectedAnswer, setSelectedAnswer] = useState<number | null>(null);
-  const [isNextButtonVisible, setNextButtonVisible] = useState(false);
-  const [answeredQuestions, setAnsweredQuestions] = useState<number[]>([]);
-  const [isAnswerCorrect, setIsAnswerCorrect] = useState<boolean | null>(null);
-  const [isQuizFinished, setIsQuizFinished] = useState(false);
-  const [isLastQuestion, setIsLastQuestion] = useState(false);
-  const [correctAnswersCount, setCorrectAnswersCount] = useState(0); // New state variable
-  const [answeredQuestionsDetails, setAnsweredQuestionsDetails] = useState<
+const QuizComp = () => {
+  const [data, setData] = useState<Quiz[]>([]);
+  const [qIndex, setQIndex] = useState(0);
+  const [nextDisabled, setNextDisabled] = useState(true);
+  const [selected, setSelected] = useState<number | null>(null);
+  const [nextVisible, setNextVisible] = useState(false);
+  const [answered, setAnswered] = useState<number[]>([]);
+  const [correct, setCorrect] = useState<boolean | null>(null);
+  const [finished, setFinished] = useState(false);
+  const [lastQ, setLastQ] = useState(false);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [details, setDetails] = useState<
     {
       question: string;
       userAnswer: string;
@@ -34,36 +34,31 @@ const QuizComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // ローカルストレージから設問データを取得
-        const storedQuizData = localStorage.getItem("quizData");
-        if (storedQuizData) {
-          // ローカルストレージにデータが存在する場合、それを使用
-          setQuizData(JSON.parse(storedQuizData));
+        const stored = localStorage.getItem("quizData");
+        if (stored) {
+          setData(JSON.parse(stored));
         } else {
-          // ローカルストレージにデータが存在しない場合、新たにデータを取得
           const response = await fetch("/quizData.json");
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
           const data = await response.json();
 
-          // ランダムにシャッフルし、最大件数を取得する
-          const shuffledData = data
+          const shuffled = data
             .sort(() => Math.random() - 0.5)
-            .slice(0, 3)
-            .map((question: any, index: number) => {
+            .slice(0, 10) // 設問数を制御
+            .map((q: any, index: number) => {
               const choices = [
-                question.choices1?.toString() || "",
-                question.choices2?.toString() || "",
-                question.choices3?.toString() || "",
-                question.choices4?.toString() || "",
+                q.choices1?.toString() || "",
+                q.choices2?.toString() || "",
+                q.choices3?.toString() || "",
+                q.choices4?.toString() || "",
               ];
-              return { ...question, choices, ID: index + 1 };
+              return { ...q, choices, ID: index + 1 };
             });
 
-          // 設問データをステートとローカルストレージに保存
-          setQuizData(shuffledData);
-          localStorage.setItem("quizData", JSON.stringify(shuffledData));
+          setData(shuffled);
+          localStorage.setItem("quizData", JSON.stringify(shuffled));
         }
       } catch (error) {
         console.error(error);
@@ -73,157 +68,135 @@ const QuizComponent = () => {
   }, []);
 
   useEffect(() => {
-    // 最後の質問の場合、最初から次へボタンを非表示にする
-    setIsLastQuestion(currentQuestionIndex === quizData.length - 1);
-  }, [currentQuestionIndex, quizData]);
+    setLastQ(qIndex === data.length - 1);
+  }, [qIndex, data]);
 
   useEffect(() => {
-    // 各設問が始まるときに次へボタンを非表示にする
-    setNextButtonVisible(false);
-  }, [currentQuestionIndex, quizData]);
+    setNextVisible(false);
+  }, [qIndex, data]);
 
-  const handleNextQuestion = () => {
-    if (currentQuestionIndex < quizData.length - 1) {
-      setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null); // Reset the selection when moving to the next question
+  const nextQ = () => {
+    if (qIndex < data.length - 1) {
+      setQIndex(qIndex + 1);
+      setSelected(null);
     } else {
-      setIsQuizFinished(true);
+      setFinished(true);
     }
-    setNextButtonDisabled(true);
-    setIsAnswerCorrect(null);
+    setNextDisabled(true);
+    setCorrect(null);
   };
 
-  const handleChoiceClick = (choiceIndex: number) => {
-    const selectedChoice = quizData[currentQuestionIndex].choices[choiceIndex];
-    const correctAnswer = quizData[currentQuestionIndex].answer;
+  const choose = (index: number) => {
+    const choice = data[qIndex].choices[index];
+    const answer = data[qIndex].answer;
 
-    // 回答が正解かどうかを判定
-    const isCorrect = selectedChoice === correctAnswer;
+    const isCorrect = choice === answer;
 
-    // 選択した回答と正解が一致しているかをセット
-    setIsAnswerCorrect(isCorrect);
+    setCorrect(isCorrect);
+    setSelected(index);
+    setNextDisabled(false);
 
-    // 選択した回答をセット
-    setSelectedAnswer(choiceIndex);
-
-    // 次へボタンを有効にする
-    setNextButtonDisabled(false);
-
-    // 最後の質問に回答していない場合は次へボタンを表示
-    if (currentQuestionIndex < quizData.length - 1) {
-      setNextButtonVisible(true);
+    if (qIndex < data.length - 1) {
+      setNextVisible(true);
     }
 
-    // 最後の質問に回答した場合、次へボタンではなく結果を見るボタンを表示
-    if (currentQuestionIndex === quizData.length - 1) {
-      setNextButtonVisible(false); // 次へボタンを非表示に
+    if (qIndex === data.length - 1) {
+      setNextVisible(false);
     } else {
-      // 最後の質問以外の場合は次へボタンを表示
-      setNextButtonVisible(true);
+      setNextVisible(true);
     }
 
     if (isCorrect) {
-      setCorrectAnswersCount(correctAnswersCount + 1);
+      setCorrectCount(correctCount + 1);
     }
 
-    // Add the selected choice and its correctness to answeredQuestionsDetails
-    setAnsweredQuestionsDetails([
-      ...answeredQuestionsDetails,
+    setDetails([
+      ...details,
       {
-        question: quizData[currentQuestionIndex].question,
-        userAnswer: selectedChoice,
-        correctAnswer,
+        question: data[qIndex].question,
+        userAnswer: choice,
+        correctAnswer: answer,
         isCorrect,
       },
     ]);
   };
 
-  const handlePreviousQuestion = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex(currentQuestionIndex - 1);
-      const previousQuestionDetails =
-        answeredQuestionsDetails[currentQuestionIndex - 1];
+  const prevQ = () => {
+    if (qIndex > 0) {
+      setQIndex(qIndex - 1);
+      const prevDetails = details[qIndex - 1];
 
-      // Check if previousQuestionDetails is not undefined
-      if (previousQuestionDetails) {
-        const previousSelectedAnswer = quizData[
-          currentQuestionIndex - 1
-        ].choices.indexOf(previousQuestionDetails.userAnswer);
-        setSelectedAnswer(previousSelectedAnswer);
+      if (prevDetails) {
+        const prevSelected = data[qIndex - 1].choices.indexOf(
+          prevDetails.userAnswer
+        );
+        setSelected(prevSelected);
       }
 
-      const updatedAnsweredQuestionsDetails = [...answeredQuestionsDetails];
-      updatedAnsweredQuestionsDetails.pop();
-      setAnsweredQuestionsDetails(updatedAnsweredQuestionsDetails);
+      const updatedDetails = [...details];
+      updatedDetails.pop();
+      setDetails(updatedDetails);
 
-      const lastAnswerIsCorrect =
-        updatedAnsweredQuestionsDetails.length > 0
-          ? updatedAnsweredQuestionsDetails[
-              updatedAnsweredQuestionsDetails.length - 1
-            ].isCorrect
+      const lastCorrect =
+        updatedDetails.length > 0
+          ? updatedDetails[updatedDetails.length - 1].isCorrect
           : false;
-      if (lastAnswerIsCorrect) {
-        setCorrectAnswersCount(correctAnswersCount - 1);
+      if (lastCorrect) {
+        setCorrectCount(correctCount - 1);
       }
     }
   };
 
-  const handleViewResultClick = () => {
-    setIsQuizFinished(true);
+  const viewResult = () => {
+    setFinished(true);
   };
 
-  const handleRetry = () => {
-    // ローカルストレージの設問データを削除
+  const retry = () => {
     localStorage.removeItem("quizData");
-    // ページをリロード
     window.location.reload();
   };
 
-  const progressBarStyle = {
-    width: `${((currentQuestionIndex + 1) / quizData.length) * 100}%`,
+  const progressStyle = {
+    width: `${((qIndex + 1) / data.length) * 100}%`,
     height: "10px",
     backgroundColor: "#4caf50",
     transition: "width 0.5s",
   };
 
   // スコア計算
-  const scorePercentage =
-    Math.floor((correctAnswersCount / quizData.length) * 1000) / 10;
+  const scorePercentage = Math.floor((correctCount / data.length) * 1000) / 10;
 
   return (
     <div
       id="qa-box"
       className="py-4 px-5 sm:py-8 sm:px-14 sm:mx-4 border border-slate-300 rounded-2xl"
     >
-      {currentQuestionIndex < quizData.length && (
+      {qIndex < data.length && (
         <div className="qa-inner">
-          {!isQuizFinished && (
+          {!finished && (
             <div className="progressLength">
-              <p>進捗：{`${currentQuestionIndex + 1}/${quizData.length}`}</p>
-              <div className="progress-bar mb-8" style={progressBarStyle}></div>
+              <p>進捗：{`${qIndex + 1}/${data.length}`}</p>
+              <div className="progress-bar mb-8" style={progressStyle}></div>
             </div>
           )}
 
-          {!isQuizFinished && (
+          {!finished && (
             <div id="qa-title" className="mb-6 font-bold">
-              {`Q.${currentQuestionIndex + 1}：${
-                quizData[currentQuestionIndex].question
-              }`}
+              {`Q.${qIndex + 1}：${data[qIndex].question}`}
             </div>
           )}
-          {!isQuizFinished && (
+          {!finished && (
             <div id="qa-choices" className="">
               <ul>
-                {quizData[currentQuestionIndex].choices.map((choice, index) => (
+                {data[qIndex].choices.map((choice, index) => (
                   <li
                     key={index}
                     className={`flex justify-between border border-slate-400 p-3 mb-3 cursor-pointer ${
-                      isNextButtonDisabled ||
-                      answeredQuestions.includes(currentQuestionIndex)
+                      nextDisabled || answered.includes(qIndex)
                         ? "cursor-not-allowed"
                         : ""
-                    } ${selectedAnswer === index ? "bg-blue-100" : ""}`}
-                    onClick={() => handleChoiceClick(index)}
+                    } ${selected === index ? "bg-blue-100" : ""}`}
+                    onClick={() => choose(index)}
                   >
                     {choice}
                   </li>
@@ -232,41 +205,41 @@ const QuizComponent = () => {
             </div>
           )}
           <div className="flex justify-between mt-8">
-            {currentQuestionIndex > 0 && !isQuizFinished ? (
+            {qIndex > 0 && !finished ? (
               <button
                 className="prev inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
-                onClick={handlePreviousQuestion}
+                onClick={prevQ}
               >
                 &lt; 前の設問に戻る
               </button>
             ) : (
-              <div></div> // 空のdivを追加
+              <div></div>
             )}
-            {isNextButtonVisible && !isQuizFinished ? (
+            {nextVisible && !finished ? (
               <div id="qa-next-button">
                 <button
                   className="next inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
-                  onClick={handleNextQuestion}
-                  disabled={isNextButtonDisabled}
+                  onClick={nextQ}
+                  disabled={nextDisabled}
                 >
                   次の質問に進む &gt;
                 </button>
               </div>
             ) : (
-              <div></div> // 空のdivを追加
+              <div></div>
             )}
           </div>
-          {isLastQuestion && selectedAnswer !== null && !isQuizFinished && (
+          {lastQ && selected !== null && !finished && (
             <div id="qa-next-button" className="flex justify-center my-8">
               <button
-                onClick={handleViewResultClick}
+                onClick={viewResult}
                 className="next block w-1/2 text-center p-4 bg-orange-500 text-white rounded hover:bg-orange-400"
               >
                 結果を見る
               </button>
             </div>
           )}
-          {isQuizFinished && (
+          {finished && (
             <div id="result-box">
               <p className="text-center font-bold text-2xl mb-10">実施結果</p>
 
@@ -277,7 +250,7 @@ const QuizComponent = () => {
                       合否
                     </dt>
                     <dd className="w-full">
-                      {correctAnswersCount === quizData.length ? (
+                      {correctCount === data.length ? (
                         <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block">
                           合格
                         </span>
@@ -326,7 +299,7 @@ const QuizComponent = () => {
               </ul>
 
               <div className="mb-20">
-                {answeredQuestionsDetails.map((detail, index) => (
+                {details.map((detail, index) => (
                   <div key={index} className="answer-card mb-10">
                     <div className="mb-4 font-bold">
                       Q.{index + 1}:
@@ -376,7 +349,7 @@ const QuizComponent = () => {
 
               <div className="flex justify-center flex-col">
                 <button
-                  onClick={handleRetry}
+                  onClick={retry}
                   className="bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
                 >
                   もう一度挑戦する
@@ -390,4 +363,4 @@ const QuizComponent = () => {
   );
 };
 
-export default QuizComponent;
+export default QuizComp;
