@@ -1,6 +1,7 @@
 "use client";
-import Link from "next/link";
-import React, { useEffect, useState } from "react";
+
+import React, { useState, useEffect } from "react";
+
 interface Quiz {
   ID: number;
   category: string;
@@ -10,8 +11,14 @@ interface Quiz {
   explanation: string;
 }
 
-const QuizComp = () => {
-  const [data, setData] = useState<Quiz[]>([]);
+interface Props {
+  initialData: Quiz[];
+}
+
+const QuizComp: React.FC<Props> = ({ initialData }) => {
+  const [data, setData] = useState<Quiz[]>(initialData);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
   const [qIndex, setQIndex] = useState(0);
   const [nextDisabled, setNextDisabled] = useState(true);
   const [selected, setSelected] = useState<number | null>(null);
@@ -30,42 +37,6 @@ const QuizComp = () => {
     }[]
   >([]);
   const [progress, setProgress] = useState(0);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const stored = localStorage.getItem("quizData");
-        if (stored) {
-          setData(JSON.parse(stored));
-        } else {
-          const response = await fetch("/quizData.json");
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await response.json();
-
-          const shuffled = data
-            .sort(() => Math.random() - 0.5)
-            .slice(0, 10) // 設問数を制御
-            .map((q: any, index: number) => {
-              const choices = [
-                q.choices1?.toString() || "",
-                q.choices2?.toString() || "",
-                q.choices3?.toString() || "",
-                q.choices4?.toString() || "",
-              ];
-              return { ...q, choices, ID: index + 1 };
-            });
-
-          setData(shuffled);
-          localStorage.setItem("quizData", JSON.stringify(shuffled));
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    fetchData();
-  }, []);
 
   useEffect(() => {
     setLastQ(qIndex === data.length - 1);
@@ -166,6 +137,14 @@ const QuizComp = () => {
   // スコア計算
   const scorePercentage = Math.floor((correctCount / data.length) * 1000) / 10;
 
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
+
   return (
     <div
       id="qa-box"
@@ -182,13 +161,13 @@ const QuizComp = () => {
 
           {!finished && (
             <div id="qa-title" className="mb-6 font-bold">
-              {`Q.${qIndex + 1}：${data[qIndex].question}`}
+              {`Q.${qIndex + 1}：${data[qIndex]?.question || ""}`}
             </div>
           )}
           {!finished && (
             <div id="qa-choices" className="">
               <ul>
-                {data[qIndex].choices.map((choice, index) => (
+                {data[qIndex]?.choices.map((choice, index) => (
                   <li
                     key={index}
                     className={`flex justify-between border border-slate-400 p-3 mb-3 cursor-pointer ${
