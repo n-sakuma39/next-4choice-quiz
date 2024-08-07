@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import QuizComponent from "../components/QuizComponent";
+import QuizComponent from "../components/quiz";
 import { ClipLoader } from "react-spinners";
 
 interface Quiz {

@@ -8,7 +8,7 @@ const Result = () => {
       </h1>
 
       <div id="result-box">
-        <p className="text-center font-bold text-2xl mb-10">実施結果</p>
+        <p className="text-center font-bold text-2xl mb-10 mb:mt-0">実施結果</p>
 
         <ul className="mb-5">
           <li className="border-b border-gray-300 pb-3 mb-3">
