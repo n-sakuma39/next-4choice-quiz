@@ -2,7 +2,7 @@ import Link from "next/link";
 
 const Home = () => {
   return (
-    <div className="container mx-auto flex justify-center flex-col md:w-3/4 my-12 bg-white p-3 py-8 md:p-10">
+    <div className="container mx-auto flex justify-center flex-col md:w-3/4 my-12 bg-white p-6 py-8 md:p-10">
       <h1 className="font-bold text-3xl mb-10 text-center">
         コーディング4択問題
       </h1>

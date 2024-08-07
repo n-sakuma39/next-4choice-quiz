@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import Button from "./elements/Button";
 
 interface Quiz {
   ID: number;
@@ -182,24 +183,24 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
           )}
           <div className="flex justify-between mt-4">
             {qIndex > 0 && !finished ? (
-              <button
+              <Button
                 className="prev inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
                 onClick={prevQ}
               >
                 &lt; 前の設問に戻る
-              </button>
+              </Button>
             ) : (
               <div></div>
             )}
             {nextVisible && !finished ? (
               <div id="qa-next-button">
-                <button
+                <Button
                   className="next inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
                   onClick={nextQ}
                   disabled={nextDisabled}
                 >
                   次の質問に進む &gt;
-                </button>
+                </Button>
               </div>
             ) : (
               <div></div>
@@ -207,12 +208,12 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
           </div>
           {lastQ && selected !== null && !finished && (
             <div id="qa-next-button" className="flex justify-center mt-8 mb-4">
-              <button
+              <Button
                 onClick={viewResult}
                 className="next bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
               >
                 結果を見る
-              </button>
+              </Button>
             </div>
           )}
           {finished && (
@@ -324,12 +325,12 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
               </div>
 
               <div className="flex justify-center flex-col">
-                <button
+                <Button
                   onClick={retry}
                   className="bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
                 >
                   もう一度挑戦する
-                </button>
+                </Button>
               </div>
             </div>
           )}
