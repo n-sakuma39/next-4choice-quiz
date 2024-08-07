@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import QuizComponent from '../components/QuizComponent';
-import { ClipLoader } from 'react-spinners';
+import { useEffect, useState } from "react";
+import QuizComponent from "../components/QuizComponent";
+import { ClipLoader } from "react-spinners";
 
 interface Quiz {
   ID: number;
@@ -22,15 +22,15 @@ const Home: React.FC = () => {
     async function fetchQuizData() {
       const apiUrl = process.env.NEXT_PUBLIC_API_URL;
       if (!apiUrl) {
-        setError('API URL is not defined');
+        setError("API URL is not defined");
         setLoading(false);
         return;
       }
 
       try {
-        const res = await fetch(apiUrl, { cache: 'no-store' });
+        const res = await fetch(apiUrl, { cache: "no-store" });
         if (!res.ok) {
-          throw new Error('Failed to fetch data');
+          throw new Error("Failed to fetch data");
         }
         const data = await res.json();
 
@@ -45,7 +45,7 @@ const Home: React.FC = () => {
 
         setData(formattedData.sort(() => Math.random() - 0.5).slice(0, 10));
       } catch (error) {
-        setError(error instanceof Error ? error.message : 'Unknown error');
+        setError(error instanceof Error ? error.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -67,8 +67,8 @@ const Home: React.FC = () => {
   }
 
   return (
-    <div className="container mx-auto flex justify-center flex-col md:w-3/4 my-12 bg-white p-10">
-      <h1 className="font-bold text-3xl mb-10 text-center">
+    <div className="container mx-auto flex justify-center flex-col md:w-3/4 my-12 bg-white p-4 py-8 md:p-10">
+      <h1 className="font-bold text-3xl mb-7 text-center">
         コーディング4択問題
       </h1>
       <QuizComponent initialData={data} />

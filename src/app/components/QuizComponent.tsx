@@ -146,10 +146,7 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
   }
 
   return (
-    <div
-      id="qa-box"
-      className="py-4 px-5 sm:py-8 sm:px-14 sm:mx-4 border border-slate-300 rounded-2xl"
-    >
+    <div id="qa-box" className="p-5 border border-slate-300 rounded-2xl">
       {qIndex < data.length && (
         <div className="qa-inner">
           {!finished && (
@@ -183,7 +180,7 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
               </ul>
             </div>
           )}
-          <div className="flex justify-between mt-8">
+          <div className="flex justify-between mt-4">
             {qIndex > 0 && !finished ? (
               <button
                 className="prev inline-block px-3 py-3 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm sm:text-base sm:px-4 sm:py-2"
@@ -209,10 +206,10 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
             )}
           </div>
           {lastQ && selected !== null && !finished && (
-            <div id="qa-next-button" className="flex justify-center my-8">
+            <div id="qa-next-button" className="flex justify-center mt-8 mb-4">
               <button
                 onClick={viewResult}
-                className="next block w-1/2 text-center p-4 bg-orange-500 text-white rounded hover:bg-orange-400"
+                className="next bg-orange-400 hover:bg-orange-300 text-white rounded px-4 py-4 font-bold inline-block w-full md:w-96 mx-auto text-center cursor-pointer"
               >
                 結果を見る
               </button>
@@ -220,14 +217,12 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
           )}
           {finished && (
             <div id="result-box">
-              <p className="text-center font-bold text-2xl mb-10">実施結果</p>
+              <p className="text-center font-bold text-2xl mb-8">実施結果</p>
 
-              <ul className="mb-5">
+              <ul className="">
                 <li className="border-b border-gray-300 pb-3 mb-3">
-                  <dl className="flex flex-col md:flex-row md:items-center">
-                    <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
-                      合否
-                    </dt>
+                  <dl className="flex items-center">
+                    <dt className="w-1/4 font-bold md:mb-0 md:mr-4">合否</dt>
                     <dd className="w-full">
                       {correctCount === data.length ? (
                         <span className="bg-green-600 px-6 py-1 text-white text-bold rounded-full inline-block">
@@ -267,9 +262,9 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
                     </dd>
                   </dl>
                 </li>
-                <li>
+                <li className="mt-8">
                   <dl className="flex flex-col md:flex-row md:items-center">
-                    <dt className="w-44 font-bold mb-2 md:mb-0 md:mr-4">
+                    <dt className="w-full font-bold mb-2 md:mb-0 md:mr-4">
                       各設問の詳細
                     </dt>
                     <dd></dd>
@@ -277,7 +272,7 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
                 </li>
               </ul>
 
-              <div className="mb-20">
+              <div className="mb-7">
                 {details.map((detail, index) => (
                   <div key={index} className="answer-card mb-10">
                     <div className="mb-4 font-bold">
@@ -294,29 +289,31 @@ const QuizComp: React.FC<Props> = ({ initialData }) => {
                     </div>
                     <ul className="flex flex-col text-sm">
                       <li className="bottom-1 border-black">
-                        <dl className="table w-full border border-gray-300">
-                          <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
+                        <dl className="flex flex-col items-center md:flex-row w-full border border-gray-300">
+                          <dt className=" bg-gray-100 font-bold p-3 border-r border-gray-300 w-full md:w-1/6">
                             設問
                           </dt>
-                          <dd className="table-cell p-4">{detail.question}</dd>
+                          <dd className="p-3 border-t border-gray-300">
+                            {detail.question}
+                          </dd>
                         </dl>
                       </li>
                       <li className="bottom-1 border-black">
-                        <dl className="table w-full border border-gray-300">
-                          <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
+                        <dl className="flex flex-col items-center md:flex-row w-full border border-gray-300">
+                          <dt className=" bg-gray-100 font-bold p-3 border-r border-gray-300 w-full md:w-1/6">
                             あなたの回答
                           </dt>
-                          <dd className="table-cell p-4">
+                          <dd className="p-3 border-t border-gray-300">
                             {detail.userAnswer}
                           </dd>
                         </dl>
                       </li>
                       <li className="bottom-1 border-black">
-                        <dl className="table w-full border border-gray-300">
-                          <dt className="table-cell w-1/6 bg-gray-100 font-bold p-4 border-r border-gray-300">
+                        <dl className="flex flex-col items-center md:flex-row w-full border border-gray-300">
+                          <dt className=" bg-gray-100 font-bold p-3 border-r border-gray-300 w-full md:w-1/6">
                             正答
                           </dt>
-                          <dd className="table-cell p-4">
+                          <dd className="p-3 border-t border-gray-300">
                             {detail.correctAnswer}
                           </dd>
                         </dl>
