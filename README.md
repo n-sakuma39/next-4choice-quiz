@@ -36,16 +36,18 @@
 
 ### 1. リポジトリのクローン
 
-bash
+```bash
 git clone [repository-url]
 cd [project-name]
+```
 
 ### 2. 依存関係のインストール
 
-bash
+```bash
 npm install
 または
 yarn install
+```
 
 ### 3. 環境変数の設定
 
@@ -74,20 +76,23 @@ npm run lint
 
 ## ディレクトリ構成
 
+```
 src/
 ├── app/
-│ ├── api/
-│ │ └── sheet/ # Google Sheets API 関連
-│ │ └── components/
-│ │ └── quiz/ # クイズ関連コンポーネント
-│ ├── quiz/ # クイズページ
-│ ├── result/ # 結果ページ
-│ ├── layout.tsx # レイアウト設定
-│ └── page.tsx # トップページ
-├── types/ # 型定義
-└── utils/ # ユーティリティ関数
+│   ├── api/
+│   │   └── sheet/          # Google Sheets API関連
+│   ├── components/
+│   │   └── quiz/          # クイズ関連コンポーネント
+│   ├── quiz/              # クイズページ
+│   ├── result/            # 結果ページ
+│   ├── layout.tsx         # レイアウト設定
+│   └── page.tsx           # トップページ
+├── types/                 # 型定義
+└── utils/                 # ユーティリティ関数
+
 public/
-└── quizData.json # ローカルテスト用データ
+└── quizData.json         # ローカルテスト用データ
+```
 
 ## Google Sheets API の設定
 
