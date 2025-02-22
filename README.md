@@ -53,10 +53,17 @@ yarn install
 
 `.env.local`ファイルをプロジェクトのルートディレクトリに作成し、以下の環境変数を設定してください：
 
+```
+# API URL設定
 NEXT_PUBLIC_API_URL=http://localhost:3000/api/sheet
+
+# Google Sheets API認証情報
 GOOGLE_CLIENT_EMAIL=your-service-account-email
 GOOGLE_PRIVATE_KEY=your-private-key
+
+# スプレッドシート設定
 SPREADSHEET_ID=your-spreadsheet-id
+```
 
 ## 利用可能なコマンド
 
@@ -80,7 +87,7 @@ npm run lint
 src/
 ├── app/
 │   ├── api/
-│   │   └── sheet/          # Google Sheets API関連
+│   │   └── sheet/         # Google Sheets API関連
 │   ├── components/
 │   │   └── quiz/          # クイズ関連コンポーネント
 │   ├── quiz/              # クイズページ
